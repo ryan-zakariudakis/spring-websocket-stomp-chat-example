@@ -26,7 +26,7 @@ function connect() {
     stompClient.connect({}, function (frame) {
         setConnected(true);
         console.log('Connected: ' + frame);
-        stompClient.subscribe('/topic/userchat/'+username, function (message) {
+        stompClient.subscribe('/topic/userchat.'+username, function (message) {
             console.log('userchat Body: ' + message.body);
             console.log('ParsedBody: ' + JSON.parse(message.body));
             showReceivedMessage(JSON.parse(message.body));

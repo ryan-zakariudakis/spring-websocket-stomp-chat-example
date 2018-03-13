@@ -19,7 +19,7 @@ class ChatController {
     var connectedUsers = mutableSetOf<String>()
 
     @MessageMapping("/userchat/{username}")
-    @SendTo("/topic/userchat/{username}")
+    @SendTo("/topic/userchat.{username}")
     @Throws(Exception::class)
     fun handleUserMessage(@DestinationVariable("username") username: String, message: ChatMessage): ChatMessage {
         log.info("Topic User {} says {}", username, message.message)
