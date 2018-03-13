@@ -15,7 +15,7 @@ class WebSocketConfig : WebSocketMessageBrokerConfigurer {
         config!!.setApplicationDestinationPrefixes("/app")
 
         // Use this for enabling a Full featured broker like RabbitMQ
-        config.enableStompBrokerRelay("/topic")
+        config.enableStompBrokerRelay("/topic", "/queue")
             .setRelayHost("localhost")
             .setRelayPort(61613)
             .setClientLogin("guest")

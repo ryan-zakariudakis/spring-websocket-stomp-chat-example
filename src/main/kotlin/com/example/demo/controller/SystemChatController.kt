@@ -3,11 +3,7 @@ package com.example.demo.controller
 import com.example.demo.model.ChatMessage
 import com.example.demo.model.ChatUser
 import org.slf4j.LoggerFactory
-import org.springframework.amqp.core.AmqpTemplate
-import org.springframework.amqp.rabbit.core.RabbitTemplate
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.messaging.handler.annotation.DestinationVariable
-import org.springframework.messaging.handler.annotation.SendTo
 import org.springframework.messaging.simp.SimpMessagingTemplate
 import org.springframework.stereotype.Controller
 import org.springframework.web.bind.annotation.GetMapping

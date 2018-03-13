@@ -12,8 +12,8 @@ function setConnected(connected) {
     }
     else {
         $("#conversation").hide();
+        hideConnectedUserInfo();
     }
-    hideConnectedUserInfo();
     $("#messages").html("");
 }
 
@@ -23,31 +23,24 @@ function connect() {
 
 
     stompClient = Stomp.over(socket);
-    stompClient.connect({}, function (frame) {
-        setConnected(true);
+    stompClient.connect({"username": username}, function (frame) {
         console.log('Connected: ' + frame);
         stompClient.subscribe('/topic/userchat.'+username, function (message) {
             console.log('userchat Body: ' + message.body);
             console.log('ParsedBody: ' + JSON.parse(message.body));
             showReceivedMessage(JSON.parse(message.body));
         });
-        stompClient.send('/app/userconnected/'+username, {}, null);
         stompClient.subscribe('/topic/connectedusers', function (message) {
             console.log('userconnected Body: ' + message.body);
             showLastUserConnected(message.body);
         });
-        stompClient.subscribe('/topic/userdisconnected', function (message) {
-            console.log('userdisconnected Body: ' + message.body);
-            showLastUserDisonnected(message.body);
-        });
+        setConnected(true);
     });
 }
 
 function disconnect() {
     if (stompClient !== null) {
         var username = $("#chatUsername").val();
-        stompClient.send('/app/userdisconnected/'+username, {}, null);
-        stompClient.send('/app/whoisconnected/', {}, null);
         stompClient.disconnect();
     }
     setConnected(false);
