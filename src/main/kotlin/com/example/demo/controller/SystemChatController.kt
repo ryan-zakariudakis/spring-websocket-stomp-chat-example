@@ -20,14 +20,16 @@ class SystemChatController {
     lateinit var simpTemplate: SimpMessagingTemplate
 
     @PostMapping("/adhoc_chat")
-    fun adhockChat(@RequestBody message: String, @RequestParam("topic") topic: String){
+    fun adhockChat(@RequestBody message: String, @RequestParam("topic") topic: String): String {
         simpTemplate.convertAndSend(topic, message)
+        return "sent_test"
+
     }
 
     @GetMapping("/send_test")
     fun testMessage(): String{
-        val message = ChatMessage(chatUser = ChatUser("ryan2"), message = "hello", fromChatUser = ChatUser("system"))
-        simpTemplate.convertAndSend("/topic/userchat.ryan", message)
+        val message = ChatMessage(chatUser = ChatUser("ryan"), message = "hello", fromChatUser = ChatUser("system"))
+        simpTemplate.convertAndSend("/topic/messages.ryan", message)
         return "sent_test"
     }
 }
