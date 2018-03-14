@@ -88,7 +88,7 @@
 			<version>${kotlin.version}</version>
 		</dependency>
 
-		<!-- Web Jar Stuff -->
+		<!-- Web Jar Stuff -for app.js -->
 		<dependency>
 			<groupId>org.webjars</groupId>
 			<artifactId>webjars-locator-core</artifactId>

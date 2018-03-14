@@ -2,11 +2,12 @@ package com.example.demo.controller
 
 import com.example.demo.model.ChatMessage
 import org.slf4j.LoggerFactory
+import org.springframework.context.annotation.Scope
 import org.springframework.stereotype.Service
-import java.time.LocalDateTime
 import java.util.*
 
 @Service
+@Scope("singleton")
 class StompMessageService {
     private val log = LoggerFactory.getLogger(StompSessionService::class.java)
     private val unReadMessages = mutableMapOf<String, MutableMap<String, ChatMessage>>()
