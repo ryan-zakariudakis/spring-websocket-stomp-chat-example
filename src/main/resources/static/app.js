@@ -1,5 +1,6 @@
 var stompClient = null;
-
+var maximumReconnectAttempts=30;
+var reconnectAttempts=0;
 function hideConnectedUserInfo() {
     $("#connectedUsers").hide();
     $("#connectedUsersCount").hide();
@@ -29,6 +30,7 @@ function connect() {
     stompClient = Stomp.over(socket);
     stompClient.connect({"username": username}, function (frame) {
         console.log('Connected: ' + frame);
+        reconnectAttempts=0;
         stompClient.subscribe('/topic/messages.'+username, function (message) {
                     console.log('userchat Body: ' + message.body);
                     var chatMessage = JSON.parse(message.body);
@@ -53,7 +55,10 @@ function connect() {
         if (frame.indexOf("Whoops! Lost connection") >= 0){
             console.log("Handling system disconnect");
             setConnected(false);
-            setTimeout(function(){ connect() }, 15000);
+            if (reconnectAttempts <= maximumReconnectAttempts){
+                reconnectAttempts++;
+                setTimeout(function(){ connect() }, 15000);
+            }
         }
     });
 }
@@ -61,6 +66,7 @@ function connect() {
 function disconnect() {
     if (stompClient !== null) {
         stompClient.disconnect();
+        reconnectAttempts=0;
     }
     setConnected(false);
     console.log("Disconnected");
