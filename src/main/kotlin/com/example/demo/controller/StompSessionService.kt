@@ -11,22 +11,36 @@ class StompSessionService {
     private val log = LoggerFactory.getLogger(StompSessionService::class.java)
 
 
-    private var connectedUsers = mutableMapOf<String, String>()
+    private var connectedUsers = mutableMapOf<String, MutableSet<String>>()
+    private var activeSessions = mutableMapOf<String, String>()
     fun connect(sessionId: String, userId: String){
         log.info("Connected user {} for session {}", userId, sessionId)
-        connectedUsers.put(sessionId, userId)
+        activeSessions.put(sessionId, userId)
+        val userSessions = connectedUsers.getOrDefault(userId, mutableSetOf(sessionId))
+        connectedUsers.put(userId, userSessions)
     }
     fun getUserForSession(sessionId: String): String{
-        val user= connectedUsers.getValue(sessionId)
+        val user= activeSessions.getValue(sessionId)
         log.info("Got User {} for sessionId {}", user, sessionId)
         return user
     }
+    fun isUserConnected(userId: String): Boolean{
+        val sessionIdSet = connectedUsers.getOrDefault(userId, mutableSetOf())
+        if (sessionIdSet.isEmpty()){
+            return true
+        }
+        return false
+    }
     fun disconnect(sessionId: String){
-        log.info("Disconnected user {} for session {}", connectedUsers.getValue(sessionId), sessionId)
-        connectedUsers.remove(sessionId)
+        log.info("Disconnected user {} for session {}", activeSessions.getValue(sessionId), sessionId)
+        val removedUserId = activeSessions.remove(sessionId) ?: return
+
+        val sessionIdSet = connectedUsers.getOrDefault(removedUserId, mutableSetOf())
+        sessionIdSet.remove(sessionId)
+        connectedUsers.put(removedUserId, sessionIdSet)
     }
     fun connectedUsers(): Collection<String> {
         log.info("Fetched ConnectedUsers")
-        return connectedUsers.values
+        return activeSessions.values.toSet()
     }
 }

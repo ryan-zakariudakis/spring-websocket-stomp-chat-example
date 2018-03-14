@@ -1,11 +1,12 @@
 package com.example.demo.controller
 
 import com.example.demo.model.ChatMessage
+import com.example.demo.model.ChatUser
+import com.example.demo.model.ConnectedChatUsers
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.messaging.handler.annotation.DestinationVariable
-import org.springframework.messaging.handler.annotation.MessageMapping
-import org.springframework.messaging.handler.annotation.SendTo
+import org.springframework.messaging.handler.annotation.*
+import org.springframework.messaging.simp.SimpMessageHeaderAccessor
 import org.springframework.messaging.simp.SimpMessagingTemplate
 import org.springframework.stereotype.Controller
 
@@ -16,24 +17,29 @@ class ChatController {
 
     @Autowired
     lateinit var stompSessionService: StompSessionService
+    @Autowired
+    lateinit var stompMessageService: StompMessageService
 
     @Autowired
     lateinit var simpTemplate: SimpMessagingTemplate
 
     @MessageMapping("/userchat/{username}")
-    @SendTo("/topic/userchat.{username}")
+    @SendTo("/topic/messages.{username}")
     @Throws(Exception::class)
-    fun handleUserMessage(@DestinationVariable("username") username: String, message: ChatMessage): ChatMessage {
-        log.info("Topic User {} says {}", username, message.message)
+    fun handleUserMessage(@DestinationVariable("username") username: String, @Payload message: ChatMessage, headerAccessor: SimpMessageHeaderAccessor): ChatMessage {
+        log.info("Topic User {} says {} to {} ", headerAccessor.getFirstNativeHeader("username"), message.message, username)
+        stompMessageService.addNewMessage(message)
+        simpTemplate.convertAndSend("/topic/messages."+message.fromChatUser.username, message)
         return message
     }
 
     @MessageMapping("/whoisconnected/")
     @SendTo("/topic/connectedusers")
     @Throws(Exception::class)
-    fun getConnectedUsers(): String {
+    fun getConnectedUsers(): ConnectedChatUsers {
         log.info("Getting connected users")
-        return stompSessionService.connectedUsers().toString()
+        val connectedChatUsers = stompSessionService.connectedUsers().map { userId -> ChatUser(userId) }
+        return ConnectedChatUsers(connectedChatUsers)
     }
 
 }

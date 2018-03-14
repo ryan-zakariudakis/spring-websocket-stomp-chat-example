@@ -1,6 +1,8 @@
 package com.example.demo.controller.listener
 
 import com.example.demo.controller.StompSessionService
+import com.example.demo.model.ChatUser
+import com.example.demo.model.ConnectedChatUsers
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.context.ApplicationListener
@@ -26,7 +28,7 @@ class StompSubscribeListener: ApplicationListener<SessionSubscribeEvent>{
         try {
             val sha = StompHeaderAccessor.wrap(event.message)
             val user = stompSessionService.getUserForSession(sha.sessionId!!)
-            log.debug("Connected event [sessionId: " + sha.sessionId + "; user: " + user + " ]")
+            log.debug("SessionSubscribeEvent event [sessionId: " + sha.sessionId + "; user: " + user + " ]")
         }catch (e: Exception) {
             log.error(e.localizedMessage, e)
         }
@@ -48,7 +50,7 @@ class StompSessionConnectedListener: ApplicationListener<SessionConnectedEvent>{
         try {
             val sha = StompHeaderAccessor.wrap(event.message)
             val user = stompSessionService.getUserForSession(sha.sessionId!!)
-            log.debug("Connected event [sessionId: " + sha.sessionId + "; user: " + user + " ]")
+            log.debug("SessionConnectedEvent event [sessionId: " + sha.sessionId + "; user: " + user + " ]")
         } catch (e: Exception) {
             log.error(e.localizedMessage, e)
         }
@@ -70,11 +72,13 @@ class StompSessionConnectListener: ApplicationListener<SessionConnectEvent>{
     override fun onApplicationEvent(event: SessionConnectEvent) {
         try {
             val sha = StompHeaderAccessor.wrap(event.message)
-            val user = sha.getNativeHeader(usernameHeader)!![0]
+            val user = sha.getFirstNativeHeader(usernameHeader)!!
 
             stompSessionService.connect(sha.sessionId!!, user)
-            simpTemplate.convertAndSend("/topic/connectedusers", stompSessionService.connectedUsers().toString())
-            log.debug("Connected event [sessionId: " + sha.sessionId + "; user: " + user + " ]")
+            val connectedChatUsers = stompSessionService.connectedUsers().map { userId -> ChatUser(userId) }
+
+            simpTemplate.convertAndSend("/topic/connectedusers", ConnectedChatUsers(connectedChatUsers))
+            log.debug("SessionConnectEvent event [sessionId: " + sha.sessionId + "; user: " + user + " ]")
         } catch (e: Exception) {
             log.error(e.localizedMessage, e)
         }
@@ -97,7 +101,7 @@ class StompSessionUnsubscribeListener: ApplicationListener<SessionUnsubscribeEve
         try {
             val sha = StompHeaderAccessor.wrap(event.message)
             val user = stompSessionService.getUserForSession(sha.sessionId!!)
-            log.debug("Connected event [sessionId: " + sha.sessionId + "; user: " + user + " ]")
+            log.debug("SessionUnsubscribeEvent event [sessionId: " + sha.sessionId + "; user: " + user + " ]")
         }catch (e: Exception) {
             log.error(e.localizedMessage, e)
         }
@@ -120,8 +124,9 @@ class StompSessionDisconnectListener: ApplicationListener<SessionDisconnectEvent
             val sha = StompHeaderAccessor.wrap(event.message)
             val user = stompSessionService.getUserForSession(sha.sessionId!!)
             stompSessionService.disconnect(sha.sessionId!!)
-            simpTemplate.convertAndSend("/topic/connectedusers", stompSessionService.connectedUsers().toString())
-            log.debug("Connected event [sessionId: " + sha.getSessionId() + "; user: " + user + " ]")
+            val connectedChatUsers = stompSessionService.connectedUsers().map { userId -> ChatUser(userId) }
+            simpTemplate.convertAndSend("/topic/connectedusers", ConnectedChatUsers(connectedChatUsers))
+            log.debug("SessionDisconnectEvent event [sessionId: " + sha.getSessionId() + "; user: " + user + " ]")
         }catch (e: Exception) {
             log.error(e.localizedMessage, e)
         }

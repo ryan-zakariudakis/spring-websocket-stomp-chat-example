@@ -26,7 +26,7 @@ class SystemChatController {
 
     @GetMapping("/send_test")
     fun testMessage(): String{
-        val message = ChatMessage(ChatUser("ryan2"), "hello")
+        val message = ChatMessage(chatUser = ChatUser("ryan2"), message = "hello", fromChatUser = ChatUser("system"))
         simpTemplate.convertAndSend("/topic/userchat.ryan", message)
         return "sent_test"
     }

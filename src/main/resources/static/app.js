@@ -1,16 +1,20 @@
 var stompClient = null;
+
 function hideConnectedUserInfo() {
-    $("#lastUserDisconnected").hide();
     $("#connectedUsers").hide();
+    $("#connectedUsersCount").hide();
 }
 
 function setConnected(connected) {
     $("#connect").prop("disabled", connected);
+    $("#chatUsername").prop("disabled", connected);
     $("#disconnect").prop("disabled", !connected);
     if (connected) {
+        $("#onlineStatus").css({'color': 'green'}).html("<i><b>online</b></i>");
         $("#conversation").show();
     }
     else {
+        $("#onlineStatus").css({'color': 'red'}).html("<i><b>offline</b></i>");
         $("#conversation").hide();
         hideConnectedUserInfo();
     }
@@ -25,22 +29,37 @@ function connect() {
     stompClient = Stomp.over(socket);
     stompClient.connect({"username": username}, function (frame) {
         console.log('Connected: ' + frame);
-        stompClient.subscribe('/topic/userchat.'+username, function (message) {
-            console.log('userchat Body: ' + message.body);
-            console.log('ParsedBody: ' + JSON.parse(message.body));
-            showReceivedMessage(JSON.parse(message.body));
-        });
+        stompClient.subscribe('/topic/messages.'+username, function (message) {
+                    console.log('userchat Body: ' + message.body);
+                    var chatMessage = JSON.parse(message.body);
+                    console.log('ParsedBody: ' + chatMessage);
+                    if (username == chatMessage.fromChatUser.username){
+                        console.log("You sent this message");
+                        showSentMessage(chatMessage);
+                    } else {
+                        console.log("You are receiving this message");
+                        showReceivedMessage(chatMessage);
+                    }
+                });
         stompClient.subscribe('/topic/connectedusers', function (message) {
+            console.log('userconnected Message: ' + message);
             console.log('userconnected Body: ' + message.body);
-            showLastUserConnected(message.body);
+            var connectedChatUsers = JSON.parse(message.body);
+            updatedConnectedUsers(connectedChatUsers);
         });
         setConnected(true);
+    }, function (frame) {
+        console.log("Error Frame: " + frame);
+        if (frame.indexOf("Whoops! Lost connection") >= 0){
+            console.log("Handling system disconnect");
+            setConnected(false);
+            setTimeout(function(){ connect() }, 15000);
+        }
     });
 }
 
 function disconnect() {
     if (stompClient !== null) {
-        var username = $("#chatUsername").val();
         stompClient.disconnect();
     }
     setConnected(false);
@@ -52,28 +71,46 @@ function sendName() {
         connect();
     }
     var username = $("#destinationUsername").val();
+    var senderUsername = $("#chatUsername").val();
     var message = $("#message").val();
-    var jsonString =  JSON.stringify({'message': message, 'chatUser': {'username': username}});
-    stompClient.send("/app/userchat/"+username, {}, jsonString);
-    appendSentMessage(message)
+    var jsonString =  JSON.stringify({'message': message, 'chatUser': {'username': username}, 'fromChatUser': {'username': senderUsername}});
+    stompClient.send("/app/userchat/"+username, {'username': senderUsername}, jsonString);
 }
 
 function showReceivedMessage(message) {
-    $("#messages").append("<tr><td>User " + message.chatUser.username + " Says: " + message.message + "</td></tr>");
+    $("#messages").append("<tr><td>" + message.sentDateTime + " - <b>" + message.fromChatUser.username + "</b> Says: " + message.message + "</td></tr>");
 }
-function appendSentMessage(message) {
-    $("#messages").append("<tr><td>You said: " + message + "</td></tr>");
-}
-
-function showLastUserConnected(usernames){
-    $("#connectedUsers").show();
-    $("#connectedUsers").html("Connected Users: " + usernames);
-
+function showSentMessage(message) {
+    $("#messages").append("<tr><td>" + message.sentDateTime+ " - <i>You said: " + message.message+ "</i></td></tr>");
 }
 
-function showLastUserDisonnected(username){
-    $("#lastUserDisconnected").show();
-    $("#lastUserDisconnected").html("Last Disconnected User: " + username);
+function updatedConnectedUsers(connectedChatUsers){
+    var connectedUsername = $("#chatUsername").val();
+
+    if (connectedChatUsers.chatUsers.length > 0) {
+        var connectedUserCount = 0;
+        var usernames = "";
+        for (var i=0;i<connectedChatUsers.chatUsers.length;i++){
+            var username = connectedChatUsers.chatUsers[i].username;
+            if (username == connectedUsername){
+                continue;
+            }
+            usernames += username;
+            connectedUserCount++;
+            if (i<connectedChatUsers.chatUsers.length-1){
+                usernames += ", ";
+            }
+        }
+        $("#connectedUsersCount").html(connectedUserCount + " Other Users online.");
+        $("#connectedUsersCount").show();
+        $("#connectedUsers").html("Users you can message: <br><b>" + usernames + "</b><br>");
+        if (connectedUserCount > 0){
+            $("#connectedUsers").show();
+        } else {
+            $("#connectedUsers").hide();
+
+        }
+    }
 }
 
 $(function () {
