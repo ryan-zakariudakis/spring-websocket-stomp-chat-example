@@ -49,6 +49,7 @@ function connect() {
             var connectedChatUsers = JSON.parse(message.body);
             updatedConnectedUsers(connectedChatUsers);
         });
+        stompClient.send("/app/whoisconnected/", {'username': username}, {});
         setConnected(true);
     }, function (frame) {
         console.log("Error Frame: " + frame);
