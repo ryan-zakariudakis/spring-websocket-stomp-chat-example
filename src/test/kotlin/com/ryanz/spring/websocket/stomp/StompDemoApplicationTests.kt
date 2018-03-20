@@ -1,4 +1,4 @@
-package com.ryanz.spring.websocket.stompws
+package com.ryanz.spring.websocket.stomp
 
 import org.junit.Test
 import org.junit.runner.RunWith

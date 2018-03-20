@@ -1,9 +1,9 @@
-package com.ryanz.spring.websocket.stompws
+package com.ryanz.spring.websocket.stomp
 
 import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.boot.runApplication
 
-@SpringBootApplication
+@SpringBootApplication(scanBasePackages = ["com.ryanz.spring.websocket.stomp"])
 class StompDemoApplication
 
 fun main(args: Array<String>) {

@@ -115,6 +115,19 @@
 		</dependency>
 	</dependencies>
 
+	<profiles>
+		<profile>
+			<id>stomp-ws</id>
+			<activation>
+				<activeByDefault>true</activeByDefault>
+			</activation>
+			<properties>
+				<start-class>com.ryanz.spring.websocket.stomp.StompDemoApplicationKt</start-class>
+				<property-file-arg>--spring.config.location=classpath:/application.properties</property-file-arg>
+			</properties>
+		</profile>
+	</profiles>
+
 	<build>
 		<sourceDirectory>src/main/kotlin</sourceDirectory>
 		<testSourceDirectory>src/test/kotlin</testSourceDirectory>
@@ -122,6 +135,10 @@
 			<plugin>
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-maven-plugin</artifactId>
+				<configuration>
+					<mainClass>${start-class}</mainClass>
+					<arguments>${property-file-arg}</arguments>
+				</configuration>
 			</plugin>
 			<plugin>
 				<artifactId>kotlin-maven-plugin</artifactId>

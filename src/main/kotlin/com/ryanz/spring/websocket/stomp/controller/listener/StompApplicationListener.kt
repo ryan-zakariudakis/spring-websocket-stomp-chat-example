@@ -1,8 +1,8 @@
-package com.ryanz.spring.websocket.stompws.controller.listener
+package com.ryanz.spring.websocket.stomp.controller.listener
 
-import com.ryanz.spring.websocket.stompws.controller.StompSessionService
-import com.ryanz.spring.websocket.stompws.model.ChatUser
-import com.ryanz.spring.websocket.stompws.model.ConnectedChatUsers
+import com.ryanz.spring.websocket.stomp.controller.StompSessionService
+import com.ryanz.spring.websocket.stomp.model.ChatUser
+import com.ryanz.spring.websocket.stomp.model.ConnectedChatUsers
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.context.ApplicationListener
@@ -28,7 +28,7 @@ class StompSubscribeListener: ApplicationListener<SessionSubscribeEvent>{
         try {
             val sha = StompHeaderAccessor.wrap(event.message)
             val user = stompSessionService.getUserForSession(sha.sessionId!!)
-            log.debug("SessionSubscribeEvent event [sessionId: " + sha.sessionId + "; user: " + user + " ]")
+            log.debug("SessionSubscribeEvent event [sessionId: " + sha.sessionId + "; user: " + user + " subscribed to: " + sha.getHeader("simpDestination") + "]")
         }catch (e: Exception) {
             log.error(e.localizedMessage, e)
         }

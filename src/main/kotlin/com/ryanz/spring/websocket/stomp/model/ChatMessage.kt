@@ -1,4 +1,4 @@
-package com.ryanz.spring.websocket.stompws.model
+package com.ryanz.spring.websocket.stomp.model
 
 import java.io.Serializable
 import java.time.LocalDateTime

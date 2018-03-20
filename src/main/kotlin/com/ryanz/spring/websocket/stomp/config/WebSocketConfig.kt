@@ -1,4 +1,4 @@
-package com.ryanz.spring.websocket.stompws.config
+package com.ryanz.spring.websocket.stomp.config
 
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Value
@@ -45,6 +45,7 @@ class WebSocketConfig : WebSocketMessageBrokerConfigurer {
     }
 
     override fun registerStompEndpoints(registry: StompEndpointRegistry) {
+        registry.addEndpoint("/gs-guide-websocket")
         registry.addEndpoint("/gs-guide-websocket").withSockJS()
     }
 }

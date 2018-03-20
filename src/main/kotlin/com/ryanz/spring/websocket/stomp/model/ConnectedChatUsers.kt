@@ -1,3 +1,3 @@
-package com.ryanz.spring.websocket.stompws.model
+package com.ryanz.spring.websocket.stomp.model
 
 data class ConnectedChatUsers (val chatUsers: List<ChatUser> = mutableListOf())

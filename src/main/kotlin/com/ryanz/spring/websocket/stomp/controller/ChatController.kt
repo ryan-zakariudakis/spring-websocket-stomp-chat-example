@@ -1,8 +1,9 @@
-package com.ryanz.spring.websocket.stompws.controller
+package com.ryanz.spring.websocket.stomp.controller
 
-import com.ryanz.spring.websocket.stompws.model.ChatMessage
-import com.ryanz.spring.websocket.stompws.model.ChatUser
-import com.ryanz.spring.websocket.stompws.model.ConnectedChatUsers
+import com.fasterxml.jackson.databind.ObjectMapper
+import com.ryanz.spring.websocket.stomp.model.ChatMessage
+import com.ryanz.spring.websocket.stomp.model.ChatUser
+import com.ryanz.spring.websocket.stomp.model.ConnectedChatUsers
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.messaging.handler.annotation.DestinationVariable
@@ -29,7 +30,14 @@ class ChatController {
     @MessageMapping("/userchat/{username}")
     @SendTo("/topic/messages.{username}")
     @Throws(Exception::class)
-    fun handleUserMessage(@DestinationVariable("username") username: String, @Payload message: ChatMessage, headerAccessor: SimpMessageHeaderAccessor): ChatMessage {
+    fun handleUserMessage(@DestinationVariable("username") username: String, @Payload payload: String, headerAccessor: SimpMessageHeaderAccessor): ChatMessage {
+        val message: ChatMessage
+        try {
+            message = ObjectMapper().readValue(payload, ChatMessage::class.java)
+        } catch (e: Exception){
+            log.error("Could not convert payload to ChatMessage")
+            throw RuntimeException("Could not convert payload to Type ChatMessage Reason="+e.localizedMessage)
+        }
         log.info("Topic User {} says {} to {} ", headerAccessor.getFirstNativeHeader("username"), message.message, username)
         stompMessageService.addNewMessage(message)
         simpTemplate.convertAndSend("/topic/messages."+message.fromChatUser.username, message)

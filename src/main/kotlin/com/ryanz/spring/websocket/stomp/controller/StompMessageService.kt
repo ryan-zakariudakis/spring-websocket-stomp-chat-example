@@ -1,6 +1,6 @@
-package com.ryanz.spring.websocket.stompws.controller
+package com.ryanz.spring.websocket.stomp.controller
 
-import com.ryanz.spring.websocket.stompws.model.ChatMessage
+import com.ryanz.spring.websocket.stomp.model.ChatMessage
 import org.slf4j.LoggerFactory
 import org.springframework.context.annotation.Scope
 import org.springframework.stereotype.Service
