@@ -1,7 +1,7 @@
-package com.example.demo.controller
+package com.ryanz.spring.websocket.stompws.controller
 
-import com.example.demo.model.ChatMessage
-import com.example.demo.model.ChatUser
+import com.ryanz.spring.websocket.stompws.model.ChatMessage
+import com.ryanz.spring.websocket.stompws.model.ChatUser
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.messaging.simp.SimpMessagingTemplate

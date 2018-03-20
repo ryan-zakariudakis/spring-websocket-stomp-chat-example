@@ -1,7 +1,8 @@
 # Spring MVC with STOMP over Websockets
 
-## Running App
-You can run this demo application as is without any external dependencies by Running the main class in DemoApplication.kt
+## Running App 
+You can run this demo application as is without any external dependencies by Running the main class in StompDemoApplication.kt
+Execute `mvn spring-boot:run to compile and start the project`
 
 ### Alternative Run setup
 Alternatively you  can start this up with a Rabbit MQ as the Stomp Relay Message broker by setting the `destination.stomp.simplebroker=false` and configuring the rabbitmq broker details.

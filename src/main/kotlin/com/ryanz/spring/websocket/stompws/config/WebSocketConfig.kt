@@ -1,4 +1,4 @@
-package com.example.demo.config
+package com.ryanz.spring.websocket.stompws.config
 
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Value
@@ -21,17 +21,17 @@ class WebSocketConfig : WebSocketMessageBrokerConfigurer {
     lateinit var destinationPrefixes: Array<String>
     @Value("\${destination.stomp.simplebroker:true}")
     var useStompSimpleBroker: Boolean = true
-    @Value("\${destination.rabbitmq.host:$DEFAULT_STOMP_BROKER_HOST}")
+    @Value("\${destination.rabbitmq.host:${DEFAULT_STOMP_BROKER_HOST}}")
     lateinit var rabbitMqHost: String
-    @Value("\${destination.rabbitmq.stomp.port:$DEFAULT_STOMP_BROKER_PORT}")
+    @Value("\${destination.rabbitmq.stomp.port:${DEFAULT_STOMP_BROKER_PORT}}")
     var rabbitMqStompPort: Int = DEFAULT_STOMP_BROKER_PORT
-    @Value("\${destination.rabbitmq.username:$DEFAULT_STOMP_BROKER_USERNAME}")
+    @Value("\${destination.rabbitmq.username:${DEFAULT_STOMP_BROKER_USERNAME}}")
     lateinit var rabbitMqUsername: String
-    @Value("\${destination.rabbitmq.password:$DEFAULT_STOMP_BROKER_PASSWORD}")
+    @Value("\${destination.rabbitmq.password:${DEFAULT_STOMP_BROKER_PASSWORD}}")
     lateinit var rabbitMqPassword: String
 
     override fun configureMessageBroker(config: MessageBrokerRegistry) {
-        config!!.setApplicationDestinationPrefixes("/app")
+        config.setApplicationDestinationPrefixes("/app")
         log.info("Using SimpleBroker={}", if(useStompSimpleBroker) "yes" else "no")
         if (useStompSimpleBroker){
             config.enableSimpleBroker(*destinationPrefixes)
@@ -45,6 +45,6 @@ class WebSocketConfig : WebSocketMessageBrokerConfigurer {
     }
 
     override fun registerStompEndpoints(registry: StompEndpointRegistry) {
-        registry!!.addEndpoint("/gs-guide-websocket").withSockJS()
+        registry.addEndpoint("/gs-guide-websocket").withSockJS()
     }
 }

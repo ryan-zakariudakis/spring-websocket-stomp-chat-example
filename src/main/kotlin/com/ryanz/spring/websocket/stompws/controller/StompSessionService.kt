@@ -1,4 +1,4 @@
-package com.example.demo.controller
+package com.ryanz.spring.websocket.stompws.controller
 
 import org.slf4j.LoggerFactory
 import org.springframework.context.annotation.Scope

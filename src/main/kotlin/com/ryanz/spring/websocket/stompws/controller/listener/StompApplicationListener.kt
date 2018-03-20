@@ -1,8 +1,8 @@
-package com.example.demo.controller.listener
+package com.ryanz.spring.websocket.stompws.controller.listener
 
-import com.example.demo.controller.StompSessionService
-import com.example.demo.model.ChatUser
-import com.example.demo.model.ConnectedChatUsers
+import com.ryanz.spring.websocket.stompws.controller.StompSessionService
+import com.ryanz.spring.websocket.stompws.model.ChatUser
+import com.ryanz.spring.websocket.stompws.model.ConnectedChatUsers
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.context.ApplicationListener
